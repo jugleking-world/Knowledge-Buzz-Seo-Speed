@@ -1,0 +1,31 @@
+name: Release WordPress Plugin ZIP
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build-and-upload-zip:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout the repo
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2. Define plugin folder and ZIP name
+      - name: Create plugin ZIP
+        run: |
+          PLUGIN_FOLDER="knowledge-buzz-seo-speed"
+          ZIP_NAME="${PLUGIN_FOLDER}-${{ github.event.release.tag_name }}.zip"
+          rm -f $ZIP_NAME
+          zip -r $ZIP_NAME $PLUGIN_FOLDER
+          echo "ZIP created: $ZIP_NAME"
+          
+      # 3. Upload ZIP to the release
+      - name: Upload ZIP to release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: knowledge-buzz-seo-speed-${{ github.event.release.tag_name }}.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
